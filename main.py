@@ -1,13 +1,10 @@
-
-import asyncio
 import os
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
-from telegram.ext import Application, CommandHandler, MessageHandler, ContextTypes, filters
+from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
 
-# Read the bot token from the environment for safety
 TOKEN = os.environ.get("BOT_TOKEN")
 if not TOKEN:
-    raise RuntimeError("BOT_TOKEN environment variable is not set.")
+    raise RuntimeError("❌ BOT_TOKEN переменная окружения не установлена!")
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     kaspi_url = "https://kaspi.kz/transfer/77761677049"
@@ -32,15 +29,14 @@ async def handle_payment_proof(update: Update, context: ContextTypes.DEFAULT_TYP
             )
     except Exception as e:
         await update.message.reply_text("Кешіріңіз, файлды жіберу кезінде қате шықты. Әкімшіге хабарласыңыз.")
-        print(f"Error sending PDF: {e}")
+        print(f"❌ Ошибка при отправке PDF: {e}")
 
-async def main():
-    app = Application.builder().token(TOKEN).build()
-    app.add_handler(CommandHandler("start", start))
-    app.add_handler(MessageHandler(filters.PHOTO | filters.Document.PDF, handle_payment_proof))
-
-    print("Bot started. Press Ctrl+C to stop.")
-    await app.run_polling()
+def main():
+    application = Application.builder().token(TOKEN).build()
+    application.add_handler(CommandHandler("start", start))
+    application.add_handler(MessageHandler(filters.PHOTO | filters.Document.PDF, handle_payment_proof))
+    print("✅ Бот запущен.")
+    application.run_polling()
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()
